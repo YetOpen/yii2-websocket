@@ -99,14 +99,12 @@ class WebSocketServer extends Component implements MessageComponentInterface
     public function start()
     {
         try {
+            $wsServer = new WsServer($this);
             $this->server = IoServer::factory(
-                new HttpServer(
-                    new WsServer(
-                        $this
-                    )
-                ),
+                new HttpServer($wsServer),
                 $this->port
             );
+            $wsServer->enableKeepAlive($this->server->loop, 15);
             $this->trigger(self::EVENT_WEBSOCKET_OPEN);
             $this->clients = new \SplObjectStorage();
             $this->server->run();
